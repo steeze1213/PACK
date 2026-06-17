@@ -118,6 +118,13 @@
 
 4WD 아두이노 차량(쿼드러처 엔코더)이 ROS2(Humble)로 동작한다. 벽면에 부착한 **50여 개 ArUco 마커 맵**을 `solvePnP` 멀티마커로 풀어 절대 위치를 얻고, 마커가 안 보일 때는 **엔코더 오도메트리**로 추측항법한다. 앞 차량 후면의 마커(ID 98/97)와 맵 위치를 함께 활용해 **펄스 기반 추종 FSM**으로 간격(0.27~0.33m)을 유지하며 TurtleBot 리더 -> F1 -> F2 순으로 줄지어 따라온다.
 
+> ⚠️ **이전 작업 자료**: 아래 마커 맵 이미지와 `map_pose_viewer_pc.py`, `encoder_bridge_f1/config/aruco_reference.yaml`은 **이전 마커 배치 기준**이다. 이후 맵의 ArUco 마커를 전면 교체·재배치했으므로, 현재 운영 중인 마커 위치/방향(ID·좌표)과는 다르다. 측위·추종 로직 자체는 동일하게 유효하다.
+
+<p align="center">
+  <img src="images/aruco_map_layout.png" width="460" alt="ArUco 마커 맵 배치 (이전 버전)">
+  <br><sub>SLAM 맵 위 ArUco 마커(ID 10~68) 부착 위치·방향 시각화 — map_pose_viewer_pc.py (이전 마커 배치 기준)</sub>
+</p>
+
 ### 기능적 요소
 
 **4WD 차량 펌웨어 (f1_car.ino)**
@@ -143,6 +150,11 @@
 - 목표점 주행 + 마커 기반 복구 탐색
 - SLAM 맵(해상도 0.05) 기반 측위
 
+**맵·위치 모니터링 GUI (map_pose_viewer_pc.py)**
+- SLAM 맵 위에 ArUco 마커(10~68) 위치·방향과 로봇 실시간 위치·궤적 오버레이
+- 마우스 클릭으로 목표점(`/goal_pose`) 지정, 위치 점프(이상치) 시 시각 경고
+- *(위 이미지가 이 도구의 실행 화면 — 단, 마커 배치는 이전 버전 기준)*
+
 ### 활용 기술 및 도구
 
 | 구분 | 내용 |
@@ -152,6 +164,7 @@
 | **측위** | OpenCV solvePnP, ArUco 마커 맵(50+), 엔코더 오도메트리 |
 | **주행** | 추종 FSM, 웨이포인트, Nav2 / AMCL / SLAM 맵 |
 | **통신** | Serial (ENC/CMD 프로토콜), ROS2 토픽 |
+| **시각화** | OpenCV GUI 맵 뷰어 (마커·포즈·궤적 표시, 목표점 클릭 지정) |
 | **설정** | YAML (마커맵, 카메라 캘리브레이션) |
 
 ### 진행 현황
@@ -177,16 +190,19 @@
 
 ```bash
 PACK/
+├── README.md
 ├── RobotArmCase.ino            # 로봇팔 펌웨어 (Arduino Uno)
 ├── auto_pick.py                # 3물건 자동 피킹
 ├── mqtt_gateway_lite.py        # MQTT -> USB 시리얼 게이트웨이
 ├── f1_car.ino                  # 추종 4WD 차량 펌웨어 (엔코더)
+├── map_pose_viewer_pc.py       # 맵·위치 모니터링 GUI (이전 마커 배치 기준)
 ├── 로봇팔 켈리브래이션.docx      # 로봇팔 캘리브레이션 자료
+├── images/                     # 문서용 이미지 (마커 맵 캡쳐 등)
 └── encoder_bridge_f1/          # 추종 차량 ROS2 패키지
     ├── encoder_bridge/         # aruco / relative_pose / encoder_odom /
     │                           #  serial_encoder / *_follow / waypoint_drive 노드
     ├── launch/                 # f1_follow / f2_follow / robot_follow 시스템 런치
-    ├── config/                 # aruco_reference.yaml(마커맵), camera_calibration.yaml
+    ├── config/                 # aruco_reference.yaml(마커맵, 이전 배치), camera_calibration.yaml
     └── maps/                   # SLAM 맵 (map_cleaned)
 ```
 
