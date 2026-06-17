@@ -40,11 +40,6 @@
    앞차 후면 마커(ID98/97) 추적 + 맵 위치추정 병행
 ```
 
-<p align="center">
-  <img src="images/aruco_map_layout.png" width="500" alt="ArUco 마커 맵 배치">
-  <br><sub>추종 차량 측위용 ArUco 마커 맵 — 벽면 마커(ID 10~68)의 부착 위치·정면 방향과 로봇 위치를 시각화 (<code>map_pose_viewer_pc.py</code>) · 이전 마커 배치 기준</sub>
-</p>
-
 ---
 
 ## 팀 구성 및 역할 분담
