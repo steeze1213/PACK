@@ -30,10 +30,6 @@
 | **F2** | F1 후면 마커(ID 158) 추종 → 재타겟 → **A\* 경로**로 접근·지정 위치 이동 | Arduino 4WD + 쿼드러처 엔코더, Raspberry Pi, USB 카메라 |
 | **웹 대시보드** | 3대 위치·상태 실시간 관제, 미션 시작/정지 | Flask + rosbridge (브라우저가 로봇과 직접 통신) |
 
-<p align="center">
-  <img src="images/aruco_map_layout.png" width="500" alt="ArUco 마커 맵 배치">
-  <br><sub>추종 차량 측위용 ArUco 마커 맵 — 벽면 마커의 부착 위치·정면 방향과 로봇 위치 시각화 (<code>map_pose_viewer_pc.py</code>)</sub>
-</p>
 
 ## 미션 시나리오 (mission_manager 상태머신)
 
