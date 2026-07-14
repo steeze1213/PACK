@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Robot Dashboard</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/roslib@1/build/roslib.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div class="layout">
+    <!-- ===== 좌측 사이드바 ===== -->
+    <aside class="sidebar">
+      <div class="brand" title="Robot Dashboard">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="8" width="16" height="11" rx="4"/><path d="M12 3v5M9 13h.01M15 13h.01"/></svg>
+      </div>
+
+      <nav class="nav">
+        <div class="nav-item active" onclick="showSection('home', this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+          <span>home</span>
+        </div>
+        <div class="nav-item" onclick="openDrawer('log', this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+          <span>log</span>
+        </div>
+      </nav>
+
+      <div class="nav-spacer"></div>
+
+      <div class="nav-item" onclick="openDrawer('settings', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>
+        <span>settings</span>
+      </div>
+    </aside>
+
+    <!-- ===== 메인 대시보드 (한 화면에 꽉) ===== -->
+    <div class="app">
+      <div class="topbar">
+        <div class="greeting">
+          <h1>Robot Control</h1>
+          <p>실시간 로봇 관제 대시보드</p>
+        </div>
+        <div id="ros-status">ROSBridge Disconnected</div>
+      </div>
+
+      <div class="grid">
+        <!-- 맵 (주인공) -->
+        <section class="card a-map">
+          <div class="card-head">
+            <h2>Map View</h2>
+            <div class="map-actions">
+              <button class="primary" onclick="missionStart()">Mission Start</button>
+              <button class="hold" onclick="missionPause()">Pause</button>
+              <button class="stop" onclick="allStop()">All Stop</button>
+            </div>
+          </div>
+          <div class="map-wrap">
+            <div class="map-box" id="map">
+              <div id="dot-tb3" class="robot-dot" style="left: 50%; top: 20%;"></div>
+              <div id="label-tb3" class="robot-label" style="left: 50%; top: 20%;">TB3</div>
+              <div id="dot-f1" class="robot-dot" style="left: 45%; top: 35%;"></div>
+              <div id="label-f1" class="robot-label" style="left: 45%; top: 35%;">F1</div>
+              <div id="dot-f2" class="robot-dot" style="left: 55%; top: 45%;"></div>
+              <div id="label-f2" class="robot-label" style="left: 55%; top: 45%;">F2</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TB3 (리더) -->
+        <section class="card robot-card a-tb3" id="card-tb3">
+          <div class="robot-head">
+            <div class="avatar">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="8" width="14" height="10" rx="3"/><path d="M12 4v4M9 13h.01M15 13h.01"/></svg>
+            </div>
+            <div>
+              <div class="name">TurtleBot3</div>
+              <div class="role">Leader · 로봇팔</div>
+            </div>
+          </div>
+          <div class="status-grid">
+            <div class="status-row"><span class="k">Mode</span><span class="v" id="tb3-mode">-</span></div>
+            <div class="status-row"><span class="k">Marker</span><span class="v" id="tb3-marker">-</span></div>
+            <div class="status-row"><span class="k">X</span><span class="v" id="tb3-x">-</span></div>
+            <div class="status-row"><span class="k">Y</span><span class="v" id="tb3-y">-</span></div>
+            <div class="status-row"><span class="k">Yaw</span><span class="v" id="tb3-yaw">-</span></div>
+            <div class="status-row"><span class="k">Cmd</span><span class="v" id="tb3-cmd">-</span></div>
+          </div>
+          <div class="robot-buttons">
+            <button class="follow" onclick="leadStart('tb3')">Lead</button>
+            <button class="home" onclick="goHome('tb3')">Home</button>
+            <button onclick="startWaypoint('tb3')">Waypt</button>
+            <button class="stop" onclick="stopRobot('tb3')">Stop</button>
+          </div>
+        </section>
+
+        <!-- F1 -->
+        <section class="card robot-card a-f1" id="card-f1">
+          <div class="robot-head">
+            <div class="avatar">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="8" width="14" height="10" rx="3"/><path d="M12 4v4M9 13h.01M15 13h.01"/></svg>
+            </div>
+            <div>
+              <div class="name">F1 Robot</div>
+              <div class="role">Follower</div>
+            </div>
+          </div>
+          <div class="status-grid">
+            <div class="status-row"><span class="k">Mode</span><span class="v" id="f1-mode">-</span></div>
+            <div class="status-row"><span class="k">Marker</span><span class="v" id="f1-marker">-</span></div>
+            <div class="status-row"><span class="k">X</span><span class="v" id="f1-x">-</span></div>
+            <div class="status-row"><span class="k">Y</span><span class="v" id="f1-y">-</span></div>
+            <div class="status-row"><span class="k">Yaw</span><span class="v" id="f1-yaw">-</span></div>
+            <div class="status-row"><span class="k">Cmd</span><span class="v" id="f1-cmd">-</span></div>
+          </div>
+          <div class="robot-buttons">
+            <button class="follow" onclick="startFollow('f1')">Follow</button>
+            <button class="home" onclick="goHome('f1')">Home</button>
+            <button onclick="startWaypoint('f1')">Waypt</button>
+            <button class="stop" onclick="stopRobot('f1')">Stop</button>
+          </div>
+        </section>
+
+        <!-- F2 -->
+        <section class="card robot-card a-f2" id="card-f2">
+          <div class="robot-head">
+            <div class="avatar">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="8" width="14" height="10" rx="3"/><path d="M12 4v4M9 13h.01M15 13h.01"/></svg>
+            </div>
+            <div>
+              <div class="name">F2 Robot</div>
+              <div class="role">Follower</div>
+            </div>
+          </div>
+          <div class="status-grid">
+            <div class="status-row"><span class="k">Mode</span><span class="v" id="f2-mode">-</span></div>
+            <div class="status-row"><span class="k">Marker</span><span class="v" id="f2-marker">-</span></div>
+            <div class="status-row"><span class="k">X</span><span class="v" id="f2-x">-</span></div>
+            <div class="status-row"><span class="k">Y</span><span class="v" id="f2-y">-</span></div>
+            <div class="status-row"><span class="k">Yaw</span><span class="v" id="f2-yaw">-</span></div>
+            <div class="status-row"><span class="k">Cmd</span><span class="v" id="f2-cmd">-</span></div>
+          </div>
+          <div class="robot-buttons">
+            <button class="follow" onclick="startFollow('f2')">Follow</button>
+            <button class="home" onclick="goHome('f2')">Home</button>
+            <button onclick="startWaypoint('f2')">Waypt</button>
+            <button class="stop" onclick="stopRobot('f2')">Stop</button>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- ===== 오버레이 드로어 (화면을 바꾸지 않고 위에 덮음) ===== -->
+    <div class="drawer-backdrop" id="backdrop" onclick="closeDrawer()"></div>
+
+    <aside class="drawer" id="drawer-log">
+      <div class="drawer-head">
+        <h2>System Log</h2>
+        <button class="drawer-close" onclick="closeDrawer()">✕</button>
+      </div>
+      <div class="log-box" id="log"></div>
+    </aside>
+
+    <aside class="drawer" id="drawer-settings">
+      <div class="drawer-head">
+        <h2>Settings</h2>
+        <button class="drawer-close" onclick="closeDrawer()">✕</button>
+      </div>
+      <div class="drawer-body">
+        <h3 class="drawer-sub">Connection</h3>
+        <div class="setting-row">
+          <label for="ros-url">ROSBridge URL</label>
+          <input type="text" id="ros-url" />
+        </div>
+        <button class="primary" onclick="reconnectROS()">Reconnect</button>
+        <p class="hint">기본값은 config.js의 <code>ROSBRIDGE_URL</code>. 로봇 PC IP가 바뀌면 여기서 바꿔 재접속.</p>
+
+        <h3 class="drawer-sub">HOME 좌표</h3>
+        <div id="home-config"></div>
+
+        <h3 class="drawer-sub">Map</h3>
+        <div id="map-config"></div>
+        <p class="hint">좌표·맵 크기 수정은 <code>config.js</code>에서. 이 화면은 현재 적용값입니다.</p>
+      </div>
+    </aside>
+  </div>
+
+  <script src="{{ url_for('static', filename='config.js') }}"></script>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,387 @@
+/* Robot Dashboard — light, rounded. Dense single-screen + overlay drawers. */
+
+:root {
+  --bg: #d7e3f4;
+  --card: #ffffff;
+  --ink: #29344f;
+  --muted: #8592ad;
+  --line: #dfe6f2;
+  --border: #c6d3ea;
+  --border-strong: #a9bcdd;
+
+  --blue: #4a86e8;
+  --blue-soft: #e4edfc;
+  --grad: linear-gradient(135deg, #6fa9f6 0%, #4a7fe0 100%);
+  --grad-side: linear-gradient(180deg, #6ba7f5 0%, #4a86e8 100%);
+
+  --f1: #4a86e8;
+  --f2: #23b5a0;
+  --tb3: #9aa7bf;
+
+  --ok: #22b26b;
+  --warn: #e8a23d;
+  --danger: #ec5b5b;
+
+  --font: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --radius: 20px;
+  --shadow: 0 12px 30px rgba(74,134,232,.10);
+  --sidebar-w: 92px;
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== 전체 레이아웃 ===== */
+.layout { display: flex; height: 100vh; }
+
+/* ===== 좌측 사이드바 ===== */
+.sidebar {
+  flex: 0 0 var(--sidebar-w);
+  width: var(--sidebar-w);
+  background: var(--grad-side);
+  border-radius: 0 22px 22px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+  gap: 4px;
+  z-index: 40;
+}
+.sidebar .brand {
+  width: 46px; height: 46px;
+  border-radius: 15px;
+  background: rgba(255,255,255,.20);
+  color: #fff;
+  display: grid; place-items: center;
+  margin-bottom: 14px;
+}
+.nav { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; }
+.nav-spacer { flex: 1; }
+.nav-item {
+  width: 74px;
+  padding: 10px 0;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  color: rgba(255,255,255,.82);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.nav-item svg { width: 20px; height: 20px; }
+.nav-item:hover { background: rgba(255,255,255,.12); color: #fff; }
+.nav-item.active,
+.nav-item.nav-open {
+  background: rgba(255,255,255,.16);
+  border-color: rgba(255,255,255,.9);
+  color: #fff;
+}
+
+/* ===== 메인 ===== */
+.app {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 24px;
+  height: 100vh;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 0 0 auto;
+}
+.greeting h1 { margin: 0; font-size: 20px; font-weight: 600; }
+.greeting p { margin: 2px 0 0; font-size: 12.5px; color: var(--muted); }
+
+#ros-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #fff;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+#ros-status::before {
+  content: "";
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+#ros-status.connected { color: var(--ok); }
+#ros-status.connected::before {
+  background: var(--ok);
+  box-shadow: 0 0 0 3px rgba(34,178,107,.18);
+}
+
+/* ===== 대시보드 그리드: 맵(좌) + TB3/F1/F2(우) — 화면 꽉 ===== */
+.grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 336px;
+  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-areas:
+    "map tb3"
+    "map f1"
+    "map f2";
+  gap: 16px;
+}
+.a-map { grid-area: map; }
+.a-tb3 { grid-area: tb3; }
+.a-f1  { grid-area: f1; }
+.a-f2  { grid-area: f2; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.robot-card { border-top: 3px solid var(--tb3); }
+#card-tb3 { border-top-color: var(--tb3); }
+#card-f1  { border-top-color: var(--f1); }
+#card-f2  { border-top-color: var(--f2); }
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.card-head h2 { margin: 0; font-size: 15px; font-weight: 600; }
+
+/* ===== 버튼 ===== */
+button {
+  font-family: var(--font);
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 9px 15px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  background: var(--blue-soft);
+  color: var(--blue);
+  white-space: nowrap;
+  transition: filter .15s, transform .05s;
+}
+button:hover { filter: brightness(.97); }
+button:active { transform: translateY(1px); }
+button.primary { background: var(--grad); color: #fff; }
+button.hold   { background: #f2f4f8; color: var(--muted); }
+button.stop   { background: #fdeaea; color: var(--danger); }
+button.home   { background: #e6f7ef; color: var(--ok); }
+button.follow { background: var(--blue-soft); color: var(--blue); }
+
+/* ===== 맵 (실제 SLAM 맵 배경) ===== */
+.map-actions { display: flex; gap: 8px; }
+.map-wrap { flex: 1; min-height: 0; display: flex; }
+.map-box {
+  position: relative;
+  height: 100%;
+  aspect-ratio: 103 / 126;      /* 실제 맵 비율(103x126px) 유지 → 점 좌표 정확 */
+  max-width: 100%;
+  margin: 0 auto;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  image-rendering: pixelated;   /* 저해상도 맵을 또렷하게 확대 */
+  /* 위: 좌표감 주는 잔격자 / 아래: 실제 맵 이미지 */
+  background:
+    linear-gradient(rgba(74,134,232,.10) 1px, transparent 1px) 0 0 / 100% 8.33%,
+    linear-gradient(90deg, rgba(74,134,232,.10) 1px, transparent 1px) 0 0 / 10% 100%,
+    url("map.png") center / 100% 100% no-repeat,
+    #eef3fb;
+}
+.robot-dot {
+  position: absolute;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,.28);
+  z-index: 5;
+  transition: left .4s ease, top .4s ease;
+}
+.robot-label {
+  position: absolute;
+  transform: translate(-50%, -185%);
+  font-size: 11px;
+  font-weight: 600;
+  z-index: 6;
+  text-shadow: 0 1px 3px rgba(255,255,255,.9);
+  transition: left .4s ease, top .4s ease;
+}
+#dot-tb3 { background: var(--tb3); }
+#dot-f1  { background: var(--f1); }
+#dot-f2  { background: var(--f2); }
+#label-tb3 { color: var(--ink); }
+#label-f1  { color: var(--f1); }
+#label-f2  { color: var(--f2); }
+
+/* ===== 로봇 카드 (우측, 컴팩트) ===== */
+.robot-head { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
+.robot-head .avatar {
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  display: grid; place-items: center;
+  color: #fff;
+}
+#card-tb3 .avatar { background: var(--tb3); }
+#card-f1 .avatar { background: var(--f1); }
+#card-f2 .avatar { background: var(--f2); }
+.robot-head .name { font-weight: 600; font-size: 14px; }
+.robot-head .role { font-size: 11px; color: var(--muted); }
+
+.status-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 14px;
+}
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--line);
+}
+.status-row .k { color: var(--muted); font-size: 11.5px; }
+.status-row .v { font-weight: 500; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+
+.robot-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+.robot-buttons button { padding: 8px 6px; font-size: 11px; border-radius: 10px; }
+
+/* ===== 오버레이 드로어 (Log / Settings) ===== */
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(30,45,80,.28);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+  z-index: 50;
+}
+.drawer-backdrop.show { opacity: 1; pointer-events: auto; }
+
+.drawer {
+  position: fixed;
+  top: 14px;
+  bottom: 14px;
+  left: -480px;                 /* 숨김: 화면 왼쪽 밖 (너비 400px보다 크게) */
+  width: 400px;
+  max-width: calc(100vw - var(--sidebar-w) - 28px);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 50px rgba(30,45,80,.28);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  /* left를 애니메이션(px↔px calc는 보간 가능). transform+calc/%는 보간 불가라 피함 */
+  transition: left .26s cubic-bezier(.4,.9,.3,1);
+  z-index: 60;
+}
+.drawer.open { left: 106px; }  /* 사이드바(92) + 14. 순수 px라야 left 전환이 매끄럽게 보간됨 */
+.drawer-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.drawer-head h2 { margin: 0; font-size: 16px; font-weight: 600; }
+.drawer-close {
+  width: 30px; height: 30px; padding: 0;
+  border-radius: 9px;
+  background: #f2f4f8; color: var(--muted);
+  font-size: 13px;
+}
+.drawer-body { overflow-y: auto; }
+.drawer-sub {
+  margin: 16px 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.drawer-sub:first-child { margin-top: 0; }
+.hint { margin: 8px 0 0; font-size: 12px; color: var(--muted); }
+
+/* 설정 입력 */
+.setting-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+.setting-row label { font-size: 12.5px; color: var(--muted); min-width: 96px; }
+.setting-row input {
+  flex: 1; min-width: 160px;
+  font-family: var(--font); font-size: 13px;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--ink);
+  background: #f7faff;
+}
+
+/* ===== 로그 ===== */
+.log-box {
+  flex: 1;
+  min-height: 120px;
+  overflow-y: auto;
+  background: #eef3fb;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.log-line { padding: 3px 0; border-bottom: 1px solid var(--line); }
+.log-line:last-child { border-bottom: none; }
+.ok { color: var(--ok); }
+.warning { color: var(--warn); }
+.danger { color: var(--danger); }
+.log-box::-webkit-scrollbar { width: 8px; }
+.log-box::-webkit-scrollbar-thumb { background: #dbe3ef; border-radius: 4px; }
+
+/* ===== 반응형 ===== */
+@media (max-width: 980px) {
+  .app { height: auto; overflow-y: auto; }
+  .grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    grid-template-areas: "map" "tb3" "f1" "f2";
+  }
+  .map-box { aspect-ratio: 103 / 126; height: auto; width: 100%; max-width: 420px; }
+  .drawer { width: calc(100vw - var(--sidebar-w) - 28px); left: -900px; }
+}

@@ -7,6 +7,12 @@ log/
 __pycache__/
 *.py[cod]
 *.egg-info/
+.pytest_cache/
+
+# 개발 중 백업 파일
+*backup*
+*.bak
+*.bak_*
 
 # OS / 에디터
 .DS_Store

@@ -1,0 +1,278 @@
+# air_clean_robot parameters
+
+serial_air_quality_node:
+  ros__parameters:
+    serial_port: "/dev/ttyACM0"
+    baudrate: 9600
+    zone_id: "A"
+    publish_topic: "/air_quality"
+    warmup_sec: 10.0
+    reconnect_sec: 3.0
+
+sim_air_quality_publisher:
+  ros__parameters:
+    zone_id: "A"
+    publish_topic: "/air_quality"
+    mode: "dirty"
+    publish_period_sec: 1.0
+
+air_quality_task_manager:
+  ros__parameters:
+    air_quality_topic: "/air_quality"
+    target_zone: "A"
+    pm25_high_threshold: 10.0
+    pm25_low_threshold: 10.0
+    window_size: 5
+    cleaning_duration_sec: 30.0
+    use_nav2: true
+
+    dirty_zone_x: 1.0
+    dirty_zone_y: 0.0
+    dirty_zone_yaw: 0.0
+
+    home_x: 0.04172402517543966
+    home_y: -0.0379323343077205
+    home_yaw: -0.14707094383154637
+
+    nav2_wait_timeout_sec: 5.0
+
+manual_nav_controller:
+  ros__parameters:
+    command_topic: "/air_clean_command"
+    use_nav2: true
+
+    node_1_x: 2.3018288616776856
+    node_1_y: -0.008024689603752288
+    node_1_yaw: 0.4217097051530775
+
+    node_2_x: 2.352437292135011
+    node_2_y: -2.7041570456321136
+    node_2_yaw: -0.3094564395372423
+
+    node_3_x: 1.0881550059200746
+    node_3_y: -2.5840552651613824
+    node_3_yaw: -3.132554802973684
+
+    home_x: 0.04172402517543966
+    home_y: -0.0379323343077205
+    home_yaw: -0.14707094383154637
+
+    nav2_wait_timeout_sec: 5.0
+
+cmd_mqtt_subscriber:
+  ros__parameters:
+    mqtt_host: "192.168.0.55"
+    mqtt_port: 1883
+    mqtt_topic: "robot/1/cmd"
+    output_topic: "/air_clean_command"
+
+mqtt_cmd_bridge:
+  ros__parameters:
+    mqtt_host: "192.168.0.55"
+    mqtt_port: 1883
+    mqtt_topic: "robot/1/cmd"
+    mqtt_path_topic: "robot/1/path"
+
+    goal_topic: "/goal_pose"
+    command_topic: "/air_clean_command"
+    cmd_vel_topic: "/cmd_vel"
+    amcl_pose_topic: "/amcl_pose"
+    path_topic: "/astar_path"
+
+    path_max_points: 120
+    path_min_publish_interval_sec: 0.2
+    path_round_digits: 4
+
+    zone_a_x: 2.352437292135011
+    zone_a_y: -2.7041570456321136
+    zone_a_yaw: -0.3094564395372423
+
+    home_x: -0.037569766737571876
+    home_y: 0.10523828207830883
+    home_yaw: -0.007148110090032988
+
+    charge_x: -0.037569766737571876
+    charge_y: 0.10523828207830883
+    charge_yaw: -0.007148110090032988
+
+    node1_x: 2.3018
+    node1_y: -0.0080
+    node1_yaw: 0.0
+
+    node2_x: 2.3524
+    node2_y: -2.7042
+    node2_yaw: -0.3094564395372423
+
+    node3_x: 1.0881550059200746
+    node3_y: -2.5840552651613824
+    node3_yaw: -3.132554802973684
+
+    patrol_arrival_tolerance: 0.25
+    patrol_min_goal_time: 2.0
+
+dust_cells_mqtt_publisher:
+  ros__parameters:
+    cells_topic: "/dust/cells"
+    mqtt_host: "192.168.0.55"
+    mqtt_port: 1883
+    mqtt_topic: "robot/1/dust"
+    publish_interval_sec: 2.0
+    retain: true
+
+air_clean_astar_controller:
+  ros__parameters:
+    command_topic: "/air_clean_command"
+    map_topic: "/map"
+    pose_topic: "/amcl_pose"
+    goal_topic: "/goal_pose"
+    cmd_vel_topic: "/cmd_vel"
+    path_topic: "/astar_path"
+    shoe_detected_topic: "/shoe_detected"
+    scan_topic: "/scan"
+
+    node_1_x: 2.3018288616776856
+    node_1_y: -0.008024689603752288
+    node_1_yaw: 0.4217097051530775
+
+    node_2_x: 2.352437292135011
+    node_2_y: -2.7041570456321136
+    node_2_yaw: -0.3094564395372423
+
+    node_3_x: 1.0881550059200746
+    node_3_y: -2.5840552651613824
+    node_3_yaw: -3.132554802973684
+
+    home_x: 0.04172402517543966
+    home_y: -0.0379323343077205
+    home_yaw: -0.14707094383154637
+
+    occupancy_threshold: 50
+
+    # 정적 맵 장애물 크기
+    # map resolution 0.05 기준:
+    # 5 cells = 약 0.25m
+    # start blocked 원인 분리 테스트를 위해 기존보다 보수성을 낮춤
+    inflation_radius_cells: 5
+
+    # 테스트 목적:
+    # LiDAR 동적 장애물이 현재 위치 주변을 막는지 확인하기 위해 false
+    use_scan_obstacles: false
+
+    # use_scan_obstacles가 false이면 아래 값은 실제 경로계획에 거의 영향 없음
+    # 나중에 true로 다시 켤 때를 대비해 완화된 값으로 둠
+    dynamic_obstacle_inflation_cells: 2
+    dynamic_obstacle_max_range: 1.2
+    dynamic_replan_interval_sec: 0.6
+
+    replan_retry_interval_sec: 1.0
+    control_frequency: 10.0
+
+    # Pure Pursuit 주행 파라미터
+    # 중간 걸림 확인용으로 속도는 조금 낮추고, 회전은 더 잘 되게 설정
+    linear_speed: 0.05
+    max_angular_speed: 0.60
+    heading_gain: 1.2
+    goal_tolerance: 0.12
+    waypoint_tolerance: 0.08
+    rotate_in_place_threshold: 0.70
+    lookahead_points: 1
+    lookahead_distance: 0.12
+
+    # 장애물 근처 cost 부여
+    # 너무 강하면 통로가 좁아져 path failed가 날 수 있어 기존보다 완화
+    safety_cost_radius_cells: 10
+    safety_cost_weight: 4.0
+
+air_clean_pure_controller:
+  ros__parameters:
+    command_topic: "/air_clean_command"
+    map_topic: "/map"
+    pose_topic: "/amcl_pose"
+    goal_topic: "/goal_pose"
+    cmd_vel_topic: "/cmd_vel"
+    path_topic: "/astar_path"
+    shoe_detected_topic: "/shoe_detected"
+    scan_topic: "/scan"
+
+    node_1_x: 2.3018288616776856
+    node_1_y: -0.008024689603752288
+    node_1_yaw: 0.4217097051530775
+
+    node_2_x: 2.352437292135011
+    node_2_y: -2.7041570456321136
+    node_2_yaw: -0.3094564395372423
+
+    node_3_x: 1.0881550059200746
+    node_3_y: -2.5840552651613824
+    node_3_yaw: -3.132554802973684
+
+    home_x: 0.04172402517543966
+    home_y: -0.0379323343077205
+    home_yaw: -0.14707094383154637
+
+    occupancy_threshold: 50
+
+    # 정적 맵 장애물 크기
+    # map resolution 0.05 기준:
+    # 5 cells = 약 0.25m
+    # 현재 start blocked=(1,0)이 반복되므로 7에서 5로 낮춰 테스트
+    inflation_radius_cells: 5
+
+    # 중요:
+    # 현재 위치 start가 장애물로 잡히는 원인이 LiDAR 동적 장애물인지 확인하기 위해 false
+    use_scan_obstacles: false
+
+    # use_scan_obstacles가 false이면 아래 동적 장애물 값은 거의 영향 없음
+    # 추후 다시 true로 켤 때를 대비해 약하게 설정
+    dynamic_obstacle_inflation_cells: 2
+    dynamic_obstacle_max_range: 1.2
+    dynamic_replan_interval_sec: 0.6
+
+    replan_retry_interval_sec: 1.0
+    control_frequency: 10.0
+
+    # Pure Pursuit 주행 파라미터
+    linear_speed: 0.1
+    max_angular_speed: 0.50
+    heading_gain: 1.2
+    rotate_min_angular_speed: 0.12
+    goal_tolerance: 0.06
+    goal_yaw_tolerance: 0.02
+    waypoint_tolerance: 0.08
+    rotate_in_place_threshold: 0.55
+    lookahead_points: 1
+    lookahead_distance: 0.22
+    path_index_max_advance_cells: 5
+
+    # 중요: A* 경로를 직선처럼 줄여버리는 smoothing 비활성화
+    path_smoothing_enabled: false
+
+    # 장애물 근처 cost 부여
+    # 벽 근처를 피하되, 너무 강해서 경로가 막히지 않도록 완화
+    safety_cost_radius_cells: 10
+    safety_cost_weight: 4.0
+
+air_clean_gui:
+  ros__parameters:
+    command_topic: "/air_clean_command"
+    air_quality_topic: "/air_quality"
+    map_topic: "/map"
+    robot_pose_topic: "/amcl_pose"
+    path_topic: "/astar_path"
+    camera_image_topic: "/image_raw/compressed"
+    camera_update_period_sec: 0.2
+    window_title: "Air Clean Robot Control"
+
+    node_1_x: 2.3018288616776856
+    node_1_y: -0.008024689603752288
+
+    node_2_x: 2.352437292135011
+    node_2_y: -2.7041570456321136
+
+    node_3_x: 1.0881550059200746
+    node_3_y: -2.5840552651613824
+
+    home_x: 0.04172402517543966
+    home_y: -0.0379323343077205
+
+    map_max_pixels: 620
