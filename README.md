@@ -146,3 +146,7 @@ cd robot_dashboard_flask && pip install -r requirements.txt && ./run.sh
 
 추종 방식 파라미터화(마커/SLAM/라인 선택형) · 팔로워 N대 확장과 고장 시 순번 자동 대체 ·
 인계·적재/하역 완전 자동화 · 라이다 기반 동적 장애물 대응 · 작업 모듈 교체로 물류/농업/병원 범용화
+
+### 발표 자료 링크
+
+https://drive.google.com/drive/folders/1OIqmw0srdW71MtTqei_sAIaMFzfhwCH-?usp=drive_link
